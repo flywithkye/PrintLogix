@@ -1,9 +1,10 @@
 import tkinter as tk
+import customtkinter as ctk  
 from tkinter import messagebox as msgbx
 from PIL import ImageTk
 from PIL import Image as pImg
 
-import MainDisplayUI as mdUI
+import GeneralViewUI as genUI
 
 class LoginUI(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -68,8 +69,8 @@ class LoginUI(tk.Tk):
         print(self.errorLbl)
         
         # Login Button
-        self.loginBtn = tk.Button(master=self.mainFrame, text="Login", bg=dark_green, bd=0.5, relief="groove", font=("Arial Bold", 12), fg=white, width=24, command=self.OpenMainDisplay)
-        self.loginBtn.pack(anchor="w", pady=(15, 0), padx=(30, 20))
+        self.loginBtn = ctk.CTkButton(master=self.mainFrame, text="Login", fg_color=dark_green, hover_color=darker_green, font=("Arial Bold", 14), text_color="#ffffff", width=254, command=self.OpenGeneralView)
+        self.loginBtn.pack(anchor="w", pady=(15, 0), padx=(30, 0))
         
         self.toplevel_window = None
 
@@ -78,12 +79,14 @@ class LoginUI(tk.Tk):
         self.errorLbl.config(text = 'Please Enter a Valid Username & \nPassword')
         msgbx.showinfo("Message","Hey There! I hope you are doing well.")
         
-    def OpenMainDisplay(self):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = mdUI.MainDisplayUI(self)  # create window if its None or destroyed
-            self.withdraw()
+    def OpenGeneralView(self):
+        genUI.GeneralViewUI() 
+        self.withdraw()
+        """if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            self.toplevel_window = genUI.GeneralViewUI()  # create window if its None or destroyed
+            #
         else:
-            self.toplevel_window.focus()  # if window exists focus it
+            self.toplevel_window.focus()  # if window exists focus it"""
 
 
 if __name__ == "__main__":
