@@ -24,7 +24,7 @@ class SalesRecordsUI(tk.Frame):
         self.title_frame = tk.Frame(master=self.main_view, bg=white)
         self.title_frame.pack(anchor="n", fill="x",  padx=27, pady=(24, 0))
 
-        self.genTitleLbl = tk.Label(master=self.title_frame, width=50, text="Sales Print Records - Administrator - admin1234", bg=white, font=("Arial Black", 18), fg=dark_green)
+        self.genTitleLbl = ctk.CTkLabel(master=self.title_frame, width=50, text="Sales Print Records - Administrator - admin1234", fg_color=white, font=("Arial Black", 24), text_color=dark_green)
         self.genTitleLbl.pack(anchor="n")    
               
         self.search_container = tk.Frame(master=self.main_view, height=50, bg=gray)
@@ -142,7 +142,7 @@ class UploadRecords:
         self.window.wm_title("Upload Records")        
         
         window_height = 150
-        window_width = 355
+        window_width = 385
         screen_width = self.window.winfo_screenwidth()
         #screen_height = self.window.winfo_screenheight()
         x_cordinate = int((screen_width/2) - (window_width/2))
@@ -153,26 +153,26 @@ class UploadRecords:
         
         
         ctk.set_appearance_mode("light")  # keeps ctk widgets white       
-            
+        
         self.linkframe = tk.Frame(self.window)
-        self.linkframe.pack(anchor='nw', side='top', padx=15, pady=(14,2))
-        self.label = tk.Label(self.linkframe, text='Choose File: ')
-        self.label.pack(anchor='nw', side="top", pady=(0,5))   
+        self.linkframe.pack(anchor='nw', side='top', padx=15, pady=(17,0))
+        self.label = tk.Label(self.linkframe, text='Choose a .csv File: ')
+        self.label.pack(anchor='nw', side="top", pady=(0,3))   
         self.innerframe = tk.Frame(self.linkframe)
         self.innerframe.pack(anchor='nw', side="bottom")
-        self.linkentry = ctk.CTkEntry(master=self.innerframe, width=273, border_color="#2A8C55", border_width=2)
+        self.linkentry = ctk.CTkEntry(master=self.innerframe, width=299, border_color="#2A8C55", border_width=2)
         self.linkentry.pack(side="left", padx=(3,10))
         folder_img = ImageTk.PhotoImage(image=folder_img_data)
-        self.folderBtn = ctk.CTkButton(master=self.innerframe, command=self.OpenFileExplorer, width=50, image=folder_img, text="", text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.folderBtn = ctk.CTkButton(master=self.innerframe, command=self.OpenFileExplorer, width=40, image=folder_img, text="", text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.folderBtn.pack(side="right")
         
         
         
         self.buttonframe = tk.Frame(self.window)
-        self.buttonframe.pack(anchor='center', side='bottom', pady=(0,18))
-        self.uploadrecbtn = ctk.CTkButton(self.buttonframe, width=138, text="Upload File", command=self.StartUpload, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
-        self.uploadrecbtn.pack(side='left', padx=15)
-        self.cancelbtn = ctk.CTkButton(self.buttonframe, width=100, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.buttonframe.pack(anchor='center', side='bottom', pady=(0,23))
+        self.uploadrecsbtn = ctk.CTkButton(self.buttonframe, width=150, text="Upload File", command=self.StartUpload, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.uploadrecsbtn.pack(side='left', padx=15)
+        self.cancelbtn = ctk.CTkButton(self.buttonframe, width=110, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.cancelbtn.pack(side='left', padx=15)
               
 
@@ -205,7 +205,7 @@ class ExportSRecords:
         self.window.iconbitmap(icon_img)      
         self.window.wm_title("Export Sales Records")        
         
-        window_height = 195
+        window_height = 150
         window_width = 385
         screen_width = self.window.winfo_screenwidth()
         #screen_height = self.window.winfo_screenheight()
@@ -217,17 +217,10 @@ class ExportSRecords:
         
         
         ctk.set_appearance_mode("light")  # keeps ctk widgets white       
-            
-        self.nameframe = tk.Frame(self.window)
-        self.nameframe.pack(anchor='nw', side='top', pady=(17,15))
-        self.label = tk.Label(self.nameframe, text='Enter Name for File: ')
-        self.label.pack(side="left", padx=(15,5))      
-        self.nameentry = ctk.CTkEntry(master=self.nameframe, width=200, border_color="#2A8C55", border_width=2)
-        self.nameentry.pack(side="right")
         
         self.linkframe = tk.Frame(self.window)
-        self.linkframe.pack(anchor='nw', side='top', padx=15)
-        self.label = tk.Label(self.linkframe, text='Select Output Directory: ')
+        self.linkframe.pack(anchor='nw', side='top', padx=15, pady=(17,0))
+        self.label = tk.Label(self.linkframe, text='Select Output Directory & File Name: ')
         self.label.pack(anchor='nw', side="top", pady=(0,3))   
         self.innerframe = tk.Frame(self.linkframe)
         self.innerframe.pack(anchor='nw', side="bottom")

@@ -27,7 +27,7 @@ class GeneralRecordsUI(tk.Frame):
         self.title_frame = tk.Frame(master=self.main_view, bg=white)
         self.title_frame.pack(anchor="n", fill="x",  padx=27, pady=(24, 0))
 
-        self.genTitleLbl = tk.Label(master=self.title_frame, width=50, text="General Print Records - Administrator - admin1234", bg=white, font=("Arial Black", 18), fg=dark_green)
+        self.genTitleLbl = ctk.CTkLabel(master=self.title_frame, width=50, text="General Print Records - Administrator - admin1234", fg_color=white, font=("Arial Black", 24), text_color=dark_green)
         self.genTitleLbl.pack(anchor="n")    
               
         self.search_container = tk.Frame(master=self.main_view, height=50, bg=gray)
@@ -403,7 +403,7 @@ class ExportGRecords:
         self.window.iconbitmap(icon_img)      
         self.window.wm_title("Export General Records")       
         
-        window_height = 195
+        window_height = 150
         window_width = 385
         screen_width = self.window.winfo_screenwidth()
         #screen_height = self.window.winfo_screenheight()
@@ -415,18 +415,10 @@ class ExportGRecords:
         
         
         ctk.set_appearance_mode("light")  # keeps ctk widgets white       
-                
-            
-        self.nameframe = tk.Frame(self.window)
-        self.nameframe.pack(anchor='nw', side='top', pady=(17,15))
-        self.label = tk.Label(self.nameframe, text='Enter Name for File: ')
-        self.label.pack(side="left", padx=(15,5))      
-        self.nameentry = ctk.CTkEntry(master=self.nameframe, width=200, border_color="#2A8C55", border_width=2)
-        self.nameentry.pack(side="right")
         
         self.linkframe = tk.Frame(self.window)
-        self.linkframe.pack(anchor='nw', side='top', padx=15)
-        self.label = tk.Label(self.linkframe, text='Select Output Directory: ')
+        self.linkframe.pack(anchor='nw', side='top', padx=15, pady=(17,0))
+        self.label = tk.Label(self.linkframe, text='Select Output Directory & File Name: ')
         self.label.pack(anchor='nw', side="top", pady=(0,3))   
         self.innerframe = tk.Frame(self.linkframe)
         self.innerframe.pack(anchor='nw', side="bottom")
@@ -437,8 +429,9 @@ class ExportGRecords:
         self.folderBtn.pack(side="right")
         
         
+        
         self.buttonframe = tk.Frame(self.window)
-        self.buttonframe.pack(anchor='center', side='bottom', pady=(0,20))
+        self.buttonframe.pack(anchor='center', side='bottom', pady=(0,23))
         self.exportbtn = ctk.CTkButton(self.buttonframe, width=170, text="Export To Excel", command=self.StartExport, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.exportbtn.pack(side='left', padx=15)
         self.cancelbtn = ctk.CTkButton(self.buttonframe, width=110, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
