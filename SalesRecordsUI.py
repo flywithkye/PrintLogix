@@ -3,13 +3,14 @@ from CTkTable import CTkTable as ctkt
 from CTkXYFrame import *
 import tkinter as tk
 from PIL import Image as pImg
-
+from PIL import ImageTk
 
 
 class SalesRecordsUI(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        self.box = None
         
         # Pre-defining Colors
         dark_green = "#29A165"
@@ -23,7 +24,7 @@ class SalesRecordsUI(tk.Frame):
         self.title_frame = tk.Frame(master=self.main_view, bg=white)
         self.title_frame.pack(anchor="n", fill="x",  padx=27, pady=(24, 0))
 
-        self.genTitleLbl = tk.Label(master=self.title_frame, width=50, text="Sales Print Records - Administrator - admin1234", bg=white, font=("Arial Black", 19), fg=dark_green)
+        self.genTitleLbl = tk.Label(master=self.title_frame, width=50, text="Sales Print Records - Administrator - admin1234", bg=white, font=("Arial Black", 18), fg=dark_green)
         self.genTitleLbl.pack(anchor="n")    
               
         self.search_container = tk.Frame(master=self.main_view, height=50, bg=gray)
@@ -42,10 +43,10 @@ class SalesRecordsUI(tk.Frame):
         self.buttons_frame.grid_propagate(0)
         self.buttons_frame.pack(side="left")
         
-        self.uploadRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Upload Records",  font=("Arial Black", 15), text_color="#fff", fg_color="#2A8C55", hover_color="#207244", width=165)
+        self.uploadRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Upload Records",  command=lambda: self.OpenButtonWindow(UploadRecords()), font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244", width=165)
         self.uploadRecsBtn.pack(anchor="se", side="left", padx=(35, 0))
         
-        self.exportRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Export Records",  font=("Arial Black", 15), text_color="#fff", fg_color="#2A8C55", hover_color="#207244", width=160)
+        self.exportRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Export Records",  command=lambda: self.OpenButtonWindow(ExportSRecords()), font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244", width=160)
         self.exportRecsBtn.pack(anchor="se", side="left", padx=(35, 0))
                
   
@@ -95,3 +96,162 @@ class SalesRecordsUI(tk.Frame):
         self.table.edit_row(0, text_color=white, hover_color="#2A8C55")
         self.table.pack()
         self.table.pack(anchor="w", side="left")
+        
+        
+        
+        
+    def OpenButtonWindow(self, classtype):
+        if self.box != None:                
+            if self.box.window.winfo_exists() != True:                      
+                # show Toplevel
+                self.box = classtype
+                    
+                # set it modal (to wait for value)
+                self.box.window.focus_force()
+                #self.box.window.focus_set()   # take over input focus,
+                self.box.window.grab_set()    # disable other windows while I'm open,
+                self.box.window.wait_window() # and wait here until win destroyed
+        else:
+            # show Toplevel
+            self.box = classtype
+                
+            # set it modal (to wait for value)
+            self.box.window.focus_force()
+            self.box.window.focus_set()   # take over input focus,
+            #self.box.window.grab_set()    # disable other windows while I'm open,
+            self.box.window.wait_window() # and wait here until win destroyed
+            
+  
+  
+class UploadRecords:
+    def __init__(self):
+        # Storing images
+        icon_img = "images\\logo.ico"
+        folder_img_data = pImg.open("images\\folder_icon.png")
+        folder_img_data = folder_img_data.resize((21, 21))
+        
+        # Pre-defining Colors
+        dark_green = "#29A165"
+        darker_green = "#1E8350" 
+        white = "#ffffff"        
+        gray = "#F0F0F0"
+        black = "#000000"
+        
+        self.window = tk.Toplevel()
+        self.window.iconbitmap(icon_img)      
+        self.window.wm_title("Upload Records")        
+        
+        window_height = 150
+        window_width = 355
+        screen_width = self.window.winfo_screenwidth()
+        #screen_height = self.window.winfo_screenheight()
+        x_cordinate = int((screen_width/2) - (window_width/2))
+        y_cordinate = 110
+        self.window.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
+            
+        self.window.resizable(False,False) 
+        
+        
+        ctk.set_appearance_mode("light")  # keeps ctk widgets white       
+            
+        self.linkframe = tk.Frame(self.window)
+        self.linkframe.pack(anchor='nw', side='top', padx=15, pady=(14,2))
+        self.label = tk.Label(self.linkframe, text='Choose File: ')
+        self.label.pack(anchor='nw', side="top", pady=(0,5))   
+        self.innerframe = tk.Frame(self.linkframe)
+        self.innerframe.pack(anchor='nw', side="bottom")
+        self.linkentry = ctk.CTkEntry(master=self.innerframe, width=273, border_color="#2A8C55", border_width=2)
+        self.linkentry.pack(side="left", padx=(3,10))
+        folder_img = ImageTk.PhotoImage(image=folder_img_data)
+        self.folderBtn = ctk.CTkButton(master=self.innerframe, command=self.OpenFileExplorer, width=50, image=folder_img, text="", text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.folderBtn.pack(side="right")
+        
+        
+        
+        self.buttonframe = tk.Frame(self.window)
+        self.buttonframe.pack(anchor='center', side='bottom', pady=(0,18))
+        self.uploadrecbtn = ctk.CTkButton(self.buttonframe, width=138, text="Upload File", command=self.StartUpload, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.uploadrecbtn.pack(side='left', padx=15)
+        self.cancelbtn = ctk.CTkButton(self.buttonframe, width=100, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.cancelbtn.pack(side='left', padx=15)
+              
+
+    def window_exit(self):
+        self.window.destroy()    
+        
+    def OpenFileExplorer(self):
+        pass
+    
+    def StartUpload(self):
+        pass
+  
+            
+            
+class ExportSRecords:
+    def __init__(self):
+        # Storing images
+        icon_img = "images\\logo.ico"
+        folder_img_data = pImg.open("images\\folder_icon.png")
+        folder_img_data = folder_img_data.resize((21, 21))
+        
+        # Pre-defining Colors
+        dark_green = "#29A165"
+        darker_green = "#1E8350" 
+        white = "#ffffff"        
+        gray = "#F0F0F0"
+        black = "#000000"
+        
+        self.window = tk.Toplevel()
+        self.window.iconbitmap(icon_img)      
+        self.window.wm_title("Export Sales Records")        
+        
+        window_height = 195
+        window_width = 385
+        screen_width = self.window.winfo_screenwidth()
+        #screen_height = self.window.winfo_screenheight()
+        x_cordinate = int((screen_width/2) - (window_width/2))
+        y_cordinate = 110
+        self.window.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
+            
+        self.window.resizable(False,False) 
+        
+        
+        ctk.set_appearance_mode("light")  # keeps ctk widgets white       
+            
+        self.nameframe = tk.Frame(self.window)
+        self.nameframe.pack(anchor='nw', side='top', pady=(17,15))
+        self.label = tk.Label(self.nameframe, text='Enter Name for File: ')
+        self.label.pack(side="left", padx=(15,5))      
+        self.nameentry = ctk.CTkEntry(master=self.nameframe, width=200, border_color="#2A8C55", border_width=2)
+        self.nameentry.pack(side="right")
+        
+        self.linkframe = tk.Frame(self.window)
+        self.linkframe.pack(anchor='nw', side='top', padx=15)
+        self.label = tk.Label(self.linkframe, text='Select Output Directory: ')
+        self.label.pack(anchor='nw', side="top", pady=(0,3))   
+        self.innerframe = tk.Frame(self.linkframe)
+        self.innerframe.pack(anchor='nw', side="bottom")
+        self.linkentry = ctk.CTkEntry(master=self.innerframe, width=299, border_color="#2A8C55", border_width=2)
+        self.linkentry.pack(side="left", padx=(3,10))
+        folder_img = ImageTk.PhotoImage(image=folder_img_data)
+        self.folderBtn = ctk.CTkButton(master=self.innerframe, command=self.OpenFileExplorer, width=40, image=folder_img, text="", text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.folderBtn.pack(side="right")
+        
+        
+        
+        self.buttonframe = tk.Frame(self.window)
+        self.buttonframe.pack(anchor='center', side='bottom', pady=(0,23))
+        self.exportbtn = ctk.CTkButton(self.buttonframe, width=170, text="Export To Excel", command=self.StartExport, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.exportbtn.pack(side='left', padx=15)
+        self.cancelbtn = ctk.CTkButton(self.buttonframe, width=110, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        self.cancelbtn.pack(side='left', padx=15)
+              
+
+    def window_exit(self):
+        self.window.destroy()  
+        
+    def OpenFileExplorer(self):
+        pass
+    
+    def StartExport(self):
+        pass

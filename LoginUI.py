@@ -9,6 +9,7 @@ import GeneralViewUI as genUI
 class LoginUI(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.protocol("WM_DELETE_WINDOW", lambda: self.quit())
         
         # Pre-defining Colors
         dark_green = "#29A165"
@@ -17,8 +18,7 @@ class LoginUI(tk.Tk):
         white = "#ffffff"          
         gray = "#EEEEEE"
         dark_gray = "#7E7E7E"
-        black = "#000000"
-        
+        black = "#000000"        
         
         # Images
         icon_img = "images\\logo.ico"
@@ -39,7 +39,7 @@ class LoginUI(tk.Tk):
         # Make app not resizable
         self.resizable(0,0) 
         # Set app title
-        self.title("PrintLogix") 
+        self.title("Welcome To PrintLogix") 
         # Set app icon
         self.iconbitmap(icon_img)
         
@@ -55,13 +55,14 @@ class LoginUI(tk.Tk):
 
         # Displayed elements
         self.welcomeLbl = tk.Label(master=self.mainFrame, text="Welcome.", bg=white, fg=dark_green, anchor="w", justify="left", font=("Arial Bold", 20)).pack(anchor="w", pady=(50, 5), padx=(25, 0))
-        self.loginLbl = tk.Label(master=self.mainFrame, text="Sign up or Login to your account \nbelow.", bg=white, fg=dark_gray, anchor="w", justify="left", compound="left", font=("Arial Bold", 11)).pack(anchor="w", padx=(24, 17))
-        
+        self.loginLbl = ctk.CTkLabel(master=self.mainFrame, text="Sign up or Login to your account\nbelow.", text_color="#7E7E7E", anchor="w", justify="left", font=("Arial Bold", 15)).pack(anchor="w", padx=(29, 0))
+
         self.userLbl = tk.Label(master=self.mainFrame, text="Username:", bg=white, fg=dark_green, anchor="w", justify="left", font=("Arial Bold", 12), image=email_icon, compound="left").pack(anchor="w", pady=(38, 0), padx=(5, 0))
-        self.userInput = tk.Entry(master=self.mainFrame, width=31, bg=gray, bd=0.5, relief="solid", fg=black).pack(anchor="w", padx=(30, 17))
+        self.userInput = ctk.CTkEntry(master=self.mainFrame, width=250, fg_color="#EEEEEE", border_color=darker_green, border_width=1, text_color="#000000")
+        self.userInput.pack(anchor="w", padx=(30, 17))
 
         self.passLbl = tk.Label(master=self.mainFrame, text="Password:",  bg=white, fg=dark_green, anchor="w", justify="left", font=("Arial Bold", 12), image=password_icon, compound="left").pack(anchor="w", pady=(21, 0), padx=(5, 0))
-        self.passInput = tk.Entry(master=self.mainFrame, width=31, bg=gray, bd=0.5, relief="solid", fg=black, show="*")
+        self.passInput = ctk.CTkEntry(master=self.mainFrame, width=250, fg_color="#EEEEEE", border_color=darker_green, border_width=1, text_color="#000000", show="*")
         self.passInput.pack(anchor="w", padx=(30, 17))
         
         self.errorLbl = tk.Label(master=self.mainFrame, text="",  bg=white, fg=error_red, anchor="w", justify="left", font=("Arial", 12), compound="left")
@@ -69,19 +70,45 @@ class LoginUI(tk.Tk):
         print(self.errorLbl)
         
         # Login Button
-        self.loginBtn = ctk.CTkButton(master=self.mainFrame, text="Login", fg_color=dark_green, hover_color=darker_green, font=("Arial Bold", 14), text_color="#ffffff", width=254, command=self.OpenGeneralView)
+        self.loginBtn = ctk.CTkButton(master=self.mainFrame, text="Login", width=250, fg_color=dark_green, hover_color=darker_green, font=("Arial Bold", 15), text_color="#ffffff", command=self.OpenGeneralView)
         self.loginBtn.pack(anchor="w", pady=(15, 0), padx=(30, 0))
         
-        self.toplevel_window = None
+        self.genUI = None
 
     def show_msg(self):
         #should call authenticate user which with invoke authorize use depending on the account
         self.errorLbl.config(text = 'Please Enter a Valid Username & \nPassword')
-        msgbx.showinfo("Message","Hey There! I hope you are doing well.")
+        msgbx.showinfo("Message","Hey There! I hope you are doin','g well.")
         
-    def OpenGeneralView(self):
-        genUI.GeneralViewUI() 
-        self.withdraw()
+    def OpenGeneralView(self):       
+        if self.genUI is None or not self.genUI.winfo_exists():           
+            self.withdraw()
+            self.genUI = genUI.GeneralViewUI(self)             
+
+        else:          
+            self.withdraw()
+            self.genUI.wm_deiconify()
+            self.genUI.state("zoomed")
+            self.genUI.focus()  # if window exists focus it
+
+    
+    def quit(self):
+        if self.genUI is not None:              
+            self.genUI.destroy()
+        self.destroy()
+             
+
+            
+   
+            
+        """
+            try:
+                self.withdraw()
+                self.genUI.focus()  # if window exists focus it
+            except Exception:
+                pass  
+        """
+        
         """if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = genUI.GeneralViewUI()  # create window if its None or destroyed
             #
@@ -90,6 +117,8 @@ class LoginUI(tk.Tk):
 
 
 if __name__ == "__main__":
-    app = LoginUI()
+    app = LoginUI()    
     app.mainloop()
+
+
     

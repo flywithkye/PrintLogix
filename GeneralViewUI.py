@@ -9,11 +9,14 @@ from tksheet import Sheet as shtk
 
 from GeneralRecordsUI import GeneralRecordsUI
 from SalesRecordsUI import SalesRecordsUI
+from LoginUI import LoginUI 
 
 class GeneralViewUI(tk.Tk):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, login, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         
+        self.LoginWin = login
+        self.protocol("WM_DELETE_WINDOW", lambda: self.quit())
         
         # Pre-defining Colors
         self.dark_green = "#29A165"
@@ -25,20 +28,23 @@ class GeneralViewUI(tk.Tk):
         # Storing images
         icon_img = "images\\logo.ico"
         logo_img_data = pImg.open("images\\ICON.png")
-        logo_img_data = logo_img_data.resize((80, 70))
+        logo_img_data = logo_img_data.resize((78, 79))
         logo_txt_data = pImg.open("images\\logo_text.png")
         logo_txt_data = logo_txt_data.resize((137, 25))
         records_img_data = pImg.open("images\\records_icon.png")
+        records_img_data = records_img_data.resize((23, 23))
         sales_img_data = pImg.open("images\\sales_icon.png")
+        sales_img_data = sales_img_data.resize((23, 23))
         settings_img_data = pImg.open("images\\settings_icon.png")
+        settings_img_data = settings_img_data.resize((23, 23))
         acnt_img_data = pImg.open("images\\acnt_icon.png")
-        totalrs_img_data = pImg.open("images\\totalrecs_icon.png")
+        acnt_img_data = acnt_img_data.resize((23, 23))
         
         # Set app title
         self.title("PrintLogix")
         # Set app size
-        self.geometry("1080x720")
-        self.minsize(1080, 720)
+        self.geometry("1920x1080")
+        self.resizable(False,False) 
         self.state("zoomed")
         # Set app icon
         self.iconbitmap(icon_img)
@@ -47,31 +53,35 @@ class GeneralViewUI(tk.Tk):
         self.sidebar_frame.pack_propagate(0)
         self.sidebar_frame.pack(fill="y", anchor="w", side="left")
         
-        logo_img = ImageTk.PhotoImage(image=logo_img_data)           
+        logo_img = ImageTk.PhotoImage(master=self.sidebar_frame, image=logo_img_data)           
         self.logoImgLbl = tk.Label(master=self.sidebar_frame, image=logo_img, bd=0, bg=self.dark_green)
         self.logoImgLbl.image = logo_img
         self.logoImgLbl.pack(pady=(55, 0), anchor="center")
         
-        logo_txt = ImageTk.PhotoImage(image=logo_txt_data)
+        logo_txt = ImageTk.PhotoImage(master=self.sidebar_frame, image=logo_txt_data)
         self.logoTxtLbl = tk.Label(master=self.sidebar_frame, bd=0, image=logo_txt, bg=self.dark_green)
         self.logoTxtLbl.image = logo_txt
         self.logoTxtLbl.pack(pady=(20, 0), anchor="center")        
         
-        recs_img = ctk.CTkImage(dark_image=records_img_data, light_image=records_img_data, size=(23, 23))
-        self.recordsBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoGenRecords, width=150, image=recs_img, text="General", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.darker_green, anchor="w")
+        self.recordsBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoGenRecords, width=150, text="General", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.darker_green, anchor="w")
         self.recordsBtn.pack(anchor="center", ipady=5, pady=(50, 0))
-
-        sales_img = ctk.CTkImage(dark_image=sales_img_data, light_image=sales_img_data, size=(23, 23))
-        self.salesBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoSalesRecords, width=150, image=sales_img, text="Sales", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.darker_green, anchor="w")
+        recs_img = ImageTk.PhotoImage(master=self.recordsBtn, image=records_img_data)
+        self.recordsBtn.configure(image=recs_img)
+        
+        self.salesBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoSalesRecords, width=150, text="Sales", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.darker_green, anchor="w")
         self.salesBtn.pack(anchor="center", ipady=5, pady=(16, 0))
+        sales_img = ImageTk.PhotoImage(master=self.salesBtn, image=sales_img_data)
+        self.salesBtn.configure(image=sales_img)        
         
-        settings_img = ctk.CTkImage(dark_image=settings_img_data, light_image=settings_img_data, size=(23, 23))
-        self.settingsBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoSettings, width=150, image=settings_img, text="Settings", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.darker_green, anchor="w")
+        self.settingsBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoSettings, width=150, text="Settings", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.darker_green, anchor="w")
         self.settingsBtn.pack(anchor="center", ipady=5, pady=(16, 0))
+        settings_img = ImageTk.PhotoImage(master=self.settingsBtn, image=settings_img_data)
+        self.settingsBtn.configure(image=settings_img)  
         
-        acnt_img = ctk.CTkImage(dark_image=acnt_img_data, light_image=acnt_img_data, size=(23, 23))
-        self.accountBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoLogin, image=acnt_img, text="Account", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.white, anchor="w")
+        self.accountBtn = ctk.CTkButton(master=self.sidebar_frame, command=self.NavigatetoLogin, text="Account", fg_color="transparent", font=("Arial Bold", 17), hover_color=self.white, anchor="w")
         self.accountBtn.pack(anchor="center", ipady=5, pady=(330, 0))
+        acnt_img = ImageTk.PhotoImage(master=self.accountBtn, image=acnt_img_data)
+        self.accountBtn.configure(image=acnt_img)
         
                 
         main_container = tk.Frame(master=self, bg=self.white)
@@ -92,7 +102,7 @@ class GeneralViewUI(tk.Tk):
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self. NavigatetoGenRecords()
+        self.NavigatetoGenRecords()
         
 
         #self.title_frame = gRecsUI.GeneralRecordsUI(self.main_view)
@@ -123,7 +133,15 @@ class GeneralViewUI(tk.Tk):
     
     
     def NavigatetoLogin(self):
-        pass
+        self.withdraw()
+        self.LoginWin.wm_deiconify()
+        
+        
+    def quit(self):
+        self.LoginWin.destroy()
+        self.destroy()
+        
+
         
         
         
@@ -162,6 +180,6 @@ class SalesRecordsUI(tk.Frame):
 """
 
         
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     app = GeneralViewUI()
-    app.mainloop()
+    app.mainloop()"""
