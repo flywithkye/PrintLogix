@@ -69,10 +69,14 @@ class PrintRepository:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute('DELETE FROM genralrecords WHERE id = ?', (record_id,))
+        print(recordId)
+
+        cursor.execute('DELETE FROM genralrecords WHERE id = ?', (recordId,))
 
         conn.commit()
         conn.close()
+        print(recordId)
+
 
 
     def get_all_records(self):
@@ -212,6 +216,11 @@ class App:
         add_button = tk.Button(self.root, text="Add Record", command=self.add_record)
         add_button.pack(pady=10)
 
+                # Create and place the button to add a record
+        delete_button = tk.Button(self.root, text="Delete Record", command=self.delete_record)
+        delete_button.pack(pady=10)
+
+
     def display_data(self):
         # Clear the existing table content
         for row in self.tree.get_children():
@@ -221,7 +230,7 @@ class App:
         records = self.repository.get_all_records()
         for record in records:
             delete_button = tk.Button(self.root, text="Delete", command=lambda r=record.id: self.delete_record(r))
-            self.tree.insert('', 'end', values=(None, record.printerModel, record.employee_name, record.quantity, record.color, record.paper_size, record.comments, record.description, record.paper_type, record.date, record.time))
+            self.tree.insert('', 'end', values=(record.id, record.printerModel, record.employee_name, record.quantity, record.color, record.paper_size, record.comments, record.description, record.paper_type, record.date, record.time))
 
     def add_record(self):
         printer_model = self.printer_model_entry.get()
@@ -247,7 +256,7 @@ class App:
         # self, id ,  printerModel, employee_name, quantity, color, paper_size
 
         record = Record(
-            id=None,
+            id=123,
             printerModel=printer_model,
             employee_name=employee_name,
             quantity=quantity,
@@ -269,10 +278,10 @@ class App:
         # Show a success message
         messagebox.showinfo("Success", "Record added successfully.")
 
-    def delete_record(self, record_id):
+    def delete_record(self):
         result = messagebox.askquestion("Delete Record", "Are you sure you want to delete this record?")
         if result == 'yes':
-            self.repository.delete_record(record_id)
+            self.repository.delete_record(13)
             self.display_data()
 
 
