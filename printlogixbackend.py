@@ -77,6 +77,37 @@ class PrintRepository:
         conn.close()
         print(recordId)
 
+    def edit_record(self, record):
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        print(record)
+
+        cursor.execute('''
+            UPDATE genralrecords SET
+            printerModel = ?,
+            employee_name = ?,
+            quantity = ?,
+            color = ?,
+            paper_size = ?,
+            date = ?,
+            time = ?,
+            paper_type = ?,
+            comments = ?,
+            description = ?
+            WHERE id = ?
+        ''', (
+            record.printerModel, record.employee_name, record.quantity, record.color,
+            record.paper_size, record.date, record.time, record.paper_type,
+            record.comments, record.description, record.id
+        ))
+
+        conn.commit()
+        conn.close()
+        # print(recordId)
+
+
+
 
 
     def get_all_records(self):
@@ -220,6 +251,10 @@ class App:
         delete_button = tk.Button(self.root, text="Delete Record", command=self.delete_record)
         delete_button.pack(pady=10)
 
+        edit_button = tk.Button(self.root, text="Edit Record", command=self.edit_record)
+        edit_button.pack(pady=10)
+
+
 
     def display_data(self):
         # Clear the existing table content
@@ -270,6 +305,8 @@ class App:
             )
 
         self.repository.add_record(record)
+        self.display_data()
+
 
         # # Clear the entry fields
         # self.name_entry.delete(0, tk.END)
@@ -277,6 +314,56 @@ class App:
 
         # Show a success message
         messagebox.showinfo("Success", "Record added successfully.")
+
+    def edit_record(self):
+        printer_model = self.printer_model_entry.get()
+        employee_name = self.employee_name_entry.get()
+        quantity = self.quantity_entry.get()
+        color = self.color_entry.get()
+        paper_size = self.paper_size_entry.get()
+        date = self.date_entry.get()
+        time = self.time_entry.get()
+        paper_type = self.paper_type_entry.get()
+        comments = self.comments_entry.get()
+        description = self.description_entry.get()
+
+            # if not name or not age:
+            #     messagebox.showerror("Error", "Please fill in all fields.")
+            #     return
+
+            # try:
+            #     age = int(age)
+            # except ValueError:
+            #     messagebox.showerror("Error", "Age must be a valid integer.")
+            #     return
+            # self, id ,  printerModel, employee_name, quantity, color, paper_size
+
+        record = Record(
+            id=9,
+            printerModel=printer_model,
+            employee_name=employee_name,
+            quantity=quantity,
+            color=color,
+            paper_size=paper_size,
+            date=date,
+            time=time,
+            paper_type=paper_type,
+            comments=comments,
+            description=description
+            )
+
+        self.repository.edit_record(record)
+        self.display_data()
+
+
+
+            # # Clear the entry fields
+            # self.name_entry.delete(0, tk.END)
+            # self.age_entry.delete(0, tk.END)
+
+            # Show a success message
+        messagebox.showinfo("Success", "Record edited successfully.")
+
 
     def delete_record(self):
         result = messagebox.askquestion("Delete Record", "Are you sure you want to delete this record?")
