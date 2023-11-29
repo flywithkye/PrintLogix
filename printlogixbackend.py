@@ -3,13 +3,18 @@ from tkinter import ttk, messagebox
 import sqlite3
 
 class Record:
-    def __init__(self, id ,  printerModel, employee_name, quantity, color, paper_size):
-        self.employee_name = employee_name
+    def __init__(self, id, printerModel, employee_name, quantity, color, paper_size, date, time, paper_type, description, comments):
+        self.id = id
         self.printerModel = printerModel
+        self.employee_name = employee_name
         self.quantity = quantity
         self.color = color
         self.paper_size = paper_size
-        self.id = id
+        self.date = date
+        self.time = time
+        self.paper_type = paper_type
+        self.description = description
+        self.comments = comments
 
 
 
@@ -21,7 +26,7 @@ class User:
 
 
 class PrintRepository:
-    def __init__(self, db_path='printlogix.db'):
+    def __init__(self, db_path="C:/Users/TAREQUE ROBINSON/Desktop/AddRecord/printlogix.db"):
         self.db_path = db_path
 
     def create_table(self):
@@ -35,7 +40,14 @@ class PrintRepository:
                 employee_name INTEGER,
                 quantity INTEGER,
                 color TEXT,
-                paper_size TEXT
+                paper_size TEXT,
+                date TEXT,
+                time TEXT,
+                paper_type TEXT,
+                comments TEXT,
+                description TEXT
+
+
 
 
             )
@@ -48,7 +60,7 @@ class PrintRepository:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute('INSERT INTO genralrecords (printerModel, employee_name, quantity, color, paper_size ) VALUES (?, ?, ?, ?, ?)', (record.printerModel, record.employee_name, record.quantity, record.color, record.paper_size))
+        cursor.execute('INSERT INTO genralrecords (printerModel, employee_name, quantity, color, paper_size, comments, description, paper_type, date, time  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (record.printerModel, record.employee_name, record.quantity, record.color, record.paper_size, record.comments, record.description, record.paper_type, record.date, record.time))
 
         conn.commit()
         conn.close()
@@ -71,11 +83,12 @@ class PrintRepository:
         data = cursor.fetchall()
 
         conn.close()
+        print(data)
 
-        return [Record(id,printerModel, employee_name, quantity, paper_size, color) for id , printerModel, employee_name, quantity, paper_size, color in data]
+        return [Record(id, printerModel, employee_name, quantity, color, paper_size, comments, description, paper_type, date, time) for id, printerModel, employee_name, quantity, color, paper_size, comments, description, paper_type, date, time in data]
 
 class UserRepository:
-    def __init__(self, db_path='example.db'):
+    def __init__(self, db_path='printlogix.db'):
         self.db_path = db_path
 
     def create_table(self):
@@ -129,13 +142,18 @@ class App:
 
     def create_widgets(self):
         # Create and place the Treeview widget
-        self.tree = ttk.Treeview(self.root, columns=('ID', 'PrinterModel', 'Employee' , 'quantity' , 'color', 'paper_size' , 'delete'), show='headings')
+        self.tree = ttk.Treeview(self.root, columns=('ID', 'PrinterModel', 'Employee' , 'quantity' , 'color', 'paper_size' , 'comments', 'description', 'paper_type', 'date', 'time', 'delete'), show='headings')
         self.tree.heading('ID', text='ID')
         self.tree.heading('PrinterModel', text='PrinterModel')
         self.tree.heading('Employee', text='Employee')
         self.tree.heading('quantity', text='quantity')
         self.tree.heading('color', text='color')
         self.tree.heading('paper_size', text='paper_size')
+        self.tree.heading('comments', text='comments')
+        self.tree.heading('description', text='description')
+        self.tree.heading('paper_type', text='paper_type')
+        self.tree.heading('date', text='date')
+        self.tree.heading('time', text='time')
         self.tree.heading('delete', text='delete')
 
 
@@ -160,10 +178,35 @@ class App:
 
         # Create and place the entry fields for adding a record
         # self.Label(root, text="Name:")
-        self.name_entry = tk.Entry(self.root)
-        self.name_entry.pack(pady=5)
-        self.age_entry = tk.Entry(self.root)
-        self.age_entry.pack(pady=5)
+        self.printer_model_entry = tk.Entry(self.root)
+        self.printer_model_entry.pack(pady=5)
+        
+        self.employee_name_entry = tk.Entry(self.root)
+        self.employee_name_entry.pack(pady=5)
+
+        self.quantity_entry = tk.Entry(self.root)
+        self.quantity_entry.pack(pady=5)
+
+        self.color_entry = tk.Entry(self.root)
+        self.color_entry.pack(pady=5)
+
+        self.paper_size_entry = tk.Entry(self.root)
+        self.paper_size_entry.pack(pady=5)
+
+        self.date_entry = tk.Entry(self.root)
+        self.date_entry.pack(pady=5)
+
+        self.time_entry = tk.Entry(self.root)
+        self.time_entry.pack(pady=5)
+
+        self.paper_type_entry = tk.Entry(self.root)
+        self.paper_type_entry.pack(pady=5)
+
+        self.comments_entry = tk.Entry(self.root)
+        self.comments_entry.pack(pady=5)
+
+        self.description_entry = tk.Entry(self.root)
+        self.description_entry.pack(pady=5)
 
         # Create and place the button to add a record
         add_button = tk.Button(self.root, text="Add Record", command=self.add_record)
@@ -178,28 +221,50 @@ class App:
         records = self.repository.get_all_records()
         for record in records:
             delete_button = tk.Button(self.root, text="Delete", command=lambda r=record.id: self.delete_record(r))
-            self.tree.insert('', 'end', values=(None, record.printerModel, record.employee_name, record.quantity, record.color, record.paper_size, delete_button))
+            self.tree.insert('', 'end', values=(None, record.printerModel, record.employee_name, record.quantity, record.color, record.paper_size, record.comments, record.description, record.paper_type, record.date, record.time))
 
     def add_record(self):
-        name = self.name_entry.get()
-        age = self.age_entry.get()
+        printer_model = self.printer_model_entry.get()
+        employee_name = self.employee_name_entry.get()
+        quantity = self.quantity_entry.get()
+        color = self.color_entry.get()
+        paper_size = self.paper_size_entry.get()
+        date = self.date_entry.get()
+        time = self.time_entry.get()
+        paper_type = self.paper_type_entry.get()
+        comments = self.comments_entry.get()
+        description = self.description_entry.get()
 
-        if not name or not age:
-            messagebox.showerror("Error", "Please fill in all fields.")
-            return
+        # if not name or not age:
+        #     messagebox.showerror("Error", "Please fill in all fields.")
+        #     return
 
-        try:
-            age = int(age)
-        except ValueError:
-            messagebox.showerror("Error", "Age must be a valid integer.")
-            return
+        # try:
+        #     age = int(age)
+        # except ValueError:
+        #     messagebox.showerror("Error", "Age must be a valid integer.")
+        #     return
+        # self, id ,  printerModel, employee_name, quantity, color, paper_size
 
-        record = Record(name, age)
+        record = Record(
+            id=None,
+            printerModel=printer_model,
+            employee_name=employee_name,
+            quantity=quantity,
+            color=color,
+            paper_size=paper_size,
+            date=date,
+            time=time,
+            paper_type=paper_type,
+            comments=comments,
+            description=description
+            )
+
         self.repository.add_record(record)
 
-        # Clear the entry fields
-        self.name_entry.delete(0, tk.END)
-        self.age_entry.delete(0, tk.END)
+        # # Clear the entry fields
+        # self.name_entry.delete(0, tk.END)
+        # self.age_entry.delete(0, tk.END)
 
         # Show a success message
         messagebox.showinfo("Success", "Record added successfully.")
