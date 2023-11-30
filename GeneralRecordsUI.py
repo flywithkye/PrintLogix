@@ -306,7 +306,10 @@ class NewRecord:
         
         self.quantity = self.pagesentry.get()
         if self.quantity.isdigit() != False:
-            valid[3] = 1
+            if int(self.quantity) > 0:
+                valid[3] = 1
+            else:
+                errorLst.append("- Invalid number of Pages.")
         else:
             errorLst.append("- Invalid number of Pages.")
         
@@ -601,7 +604,10 @@ class EditRecord:
         
         self.quantity = self.pagesentry.get()
         if self.quantity.isdigit() != False:
-            valid[3] = 1
+            if int(self.quantity) > 0:
+                valid[3] = 1
+            else:
+                errorLst.append("- Invalid number of Pages.")
         else:
             errorLst.append("- Invalid number of Pages.")
         
