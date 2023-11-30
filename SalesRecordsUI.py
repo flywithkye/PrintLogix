@@ -15,6 +15,7 @@ class SalesRecordsUI(tk.Frame):
         # Pre-defining Colors
         dark_green = "#29A165"
         darker_green = "#1E8350" 
+        error_red = "#FF0000"
         white = "#ffffff"        
         gray = "#F0F0F0"
         black = "#000000"
@@ -31,10 +32,9 @@ class SalesRecordsUI(tk.Frame):
         self.search_container.pack(fill="x", pady=(19, 0), padx=32)    
         
         ctk.set_appearance_mode("light")  # keeps ctk widgets white
-        self.filterBox = ctk.CTkComboBox(master=self.search_container, width=125, values=["Filter"], button_color="#2A8C55", border_color="#2A8C55", border_width=2, button_hover_color="#207244",dropdown_hover_color="#207244" , dropdown_fg_color="#2A8C55", dropdown_text_color="#fff")
-        self.filterBox.pack(side="right", padx=(16, 15), pady=15)
-        self.SortBox = ctk.CTkComboBox(master=self.search_container, width=125, values=["Sort By"], button_color="#2A8C55", border_color="#2A8C55", border_width=2, button_hover_color="#207244",dropdown_hover_color="#207244" , dropdown_fg_color="#2A8C55", dropdown_text_color="#fff")
-        self.SortBox.pack(side="right", padx=(16, 0), pady=15)
+        self.SortBox = ctk.CTkComboBox(master=self.search_container, width=140, state="readonly", values=["Sort By"], button_color="#2A8C55", border_color="#2A8C55", border_width=2, button_hover_color="#207244",dropdown_hover_color="#207244" , dropdown_fg_color="#2A8C55", dropdown_text_color="#fff")
+        self.SortBox.pack(side="right", padx=(16, 15), pady=15)
+        self.SortBox.set("Sort By")
         
         self.SearchEntry = ctk.CTkEntry(master=self.search_container, width=305, placeholder_text="Search Records", border_color="#2A8C55", border_width=2)
         self.SearchEntry.pack(side="right", padx=(13, 0), pady=15)

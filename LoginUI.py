@@ -1,6 +1,6 @@
 import tkinter as tk
 import customtkinter as ctk  
-from tkinter import messagebox as msgbx
+from tkinter import messagebox as mgbx
 from PIL import ImageTk
 from PIL import Image as pImg
 
@@ -71,14 +71,17 @@ class LoginUI(tk.Tk):
         
         # Login Button
         self.loginBtn = ctk.CTkButton(master=self.mainFrame, text="Login", width=250, fg_color=dark_green, hover_color=darker_green, font=("Arial Bold", 15), text_color="#ffffff", command=self.OpenGeneralView)
-        self.loginBtn.pack(anchor="w", pady=(15, 0), padx=(30, 0))
+        self.loginBtn.pack(anchor="w", pady=(5, 0), padx=(30, 0))
+        
+        self.signUpBtn = ctk.CTkButton(master=self.mainFrame, text="Sign Up", width=250, fg_color=dark_green, hover_color=darker_green, font=("Arial Bold", 15), text_color="#ffffff", command=self.OpenGeneralView)
+        self.signUpBtn.pack(anchor="w", pady=(20, 0), padx=(30, 0))
         
         self.genUI = None
 
     def show_msg(self):
         #should call authenticate user which with invoke authorize use depending on the account
         self.errorLbl.config(text = 'Please Enter a Valid Username & \nPassword')
-        msgbx.showinfo("Message","Hey There! I hope you are doin','g well.")
+        mgbx.showinfo("Message","Hey There! I hope you are doin','g well.")
         
     def OpenGeneralView(self):       
         if self.genUI is None or not self.genUI.winfo_exists():           

@@ -1,11 +1,9 @@
 import tkinter as tk
 import customtkinter as ctk  
 from CTkXYFrame import *
-from CTkTable import CTkTable as ctkt
-from tkinter.ttk import Combobox as ttkCb
+from tkinter import messagebox as mgbx
 from PIL import Image as pImg
 from PIL import ImageTk
-from tksheet import Sheet as shtk
 
 from GeneralRecordsUI import GeneralRecordsUI
 from SalesRecordsUI import SalesRecordsUI
@@ -17,6 +15,7 @@ class GeneralViewUI(tk.Tk):
         
         self.LoginWin = login
         self.protocol("WM_DELETE_WINDOW", lambda: self.quit())
+        
         
         # Pre-defining Colors
         self.dark_green = "#29A165"
@@ -136,8 +135,11 @@ class GeneralViewUI(tk.Tk):
     
     
     def NavigatetoLogin(self):
-        self.withdraw()
-        self.LoginWin.wm_deiconify()
+        result = mgbx.askquestion("Return to Login", "Are you sure you want to return to \nthe login screen?")
+        if result == 'yes':
+            self.withdraw()
+            self.LoginWin.wm_deiconify()
+        
         
         
     def quit(self):
