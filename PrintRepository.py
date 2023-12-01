@@ -1,10 +1,15 @@
+# Importing modules/libraries to communicate with a database using sql
 import sqlite3
 import os
 
+# Import record class to create the records objects to contain each record's data
 import Record as Record
 
+# Class that allows for the adding, retrieval, removal and editng of the records in the system
 class PrintRepository:
+    # Class constructor for repository, initialzes path to database
     def __init__(self):
+        # Storing referencing to when the database will be stored
         path = "database\\printlogix.db"
 
         # get the path to the directory this script is in
@@ -15,6 +20,8 @@ class PrintRepository:
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)                                                                                                                             
 
 
+    # Method to create the table with desired fields for record storage if it does not exist yet 
+    # using sql query commands
     def create_table(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -39,8 +46,9 @@ class PrintRepository:
         conn.close()
 
 
-
+    # Method to add a given record's data to the database using sql query commands
     def add_record(self, record):
+        # Connecting to the database at the given path
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -51,8 +59,9 @@ class PrintRepository:
         conn.close()
 
 
-
+    # Method to remove a record associated with the given record's id from the database using sql query commands
     def delete_record(self, recordId):
+        # Connecting to the database at the given path
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -66,13 +75,16 @@ class PrintRepository:
         
         
         
+    # Method to retrieve data associated with a given record's id from the database using sql query commands
     def find_record(self, recordId):
+        # Connecting to the database at the given path
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
         print(recordId)
 
         cursor.execute('SELECT * FROM generalrecords WHERE id = ?', (recordId,))
+        # Stores data retrieved from query
         data = cursor.fetchall()
 
         conn.commit()
@@ -84,8 +96,9 @@ class PrintRepository:
 
 
 
-
+    # Method to update changes made to the given record's data in the database using sql query commands
     def edit_record(self, record):
+        # Connecting to the database at the given path
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -115,11 +128,14 @@ class PrintRepository:
         
         
         
+    # Method to retrieve all records currently in the database using sql query commands
     def get_all_records(self):
+        # Connecting to the database at the given path
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
         cursor.execute('SELECT * FROM generalrecords')
+        # Stores data retrieved from query
         data = cursor.fetchall()
 
         conn.close()

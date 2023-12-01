@@ -1,3 +1,4 @@
+# Importing modules/libraries to build gui elements
 import customtkinter as ctk  
 from CTkTable import CTkTable as ctkt
 from CTkXYFrame import *
@@ -5,13 +6,21 @@ import tkinter as tk
 from PIL import Image as pImg
 from PIL import ImageTk
 from tkinter import messagebox as mgbx
-from datetime import datetime as dt
+from tkinter import filedialog as fd
+# Import helper libraries
 import re
+import pandas as pd 
+import string
+from datetime import datetime as dt
 
+# Import classes to create the repository to manage records in database and create
+# for the record objects
 import PrintRepository as prtrepo
 import Record as Record
 
+# General records screen that is displayed when selected using sidebar in GeneralViewUI
 class GeneralRecordsUI(tk.Frame):
+    # Class constructor for screen, creates gui components and intializes it
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -29,43 +38,55 @@ class GeneralRecordsUI(tk.Frame):
         gray = "#F0F0F0"
         black = "#000000"
         
+        # Container/frame in which all widgets are displayed   
         self.main_view = tk.Frame(self, bg=white)
         self.main_view.pack(side="left", fill="both", expand=True)
+        # Container/frame in which the title is displayed  
         self.title_frame = tk.Frame(master=self.main_view, bg=white)
         self.title_frame.pack(anchor="n", fill="x",  padx=27, pady=(24, 0))
 
+        # Creating label to store and display title of the screen
         self.genTitleLbl = ctk.CTkLabel(master=self.title_frame, width=50, text="General Print Records - Administrator - admin1234", fg_color=white, font=("Arial Black", 24), text_color=dark_green)
         self.genTitleLbl.pack(anchor="n")    
-              
+        
+        # Container/frame in which the search widgets are displayed
         self.search_container = tk.Frame(master=self.main_view, height=50, bg=gray)
         self.search_container.pack(fill="x", pady=(19, 0), padx=32)    
         
         ctk.set_appearance_mode("light")  # keeps ctk widgets white
+        # Dropdwon for sort options
         self.SortBox = ctk.CTkComboBox(master=self.search_container, width=140, state="readonly", values=["Sort By", "Record ID", "Date Ascending", "Date Descending"], button_color="#2A8C55", border_color="#2A8C55", border_width=2, button_hover_color="#207244",dropdown_hover_color="#207244" , dropdown_fg_color="#2A8C55", dropdown_text_color="#fff")
         self.SortBox.pack(side="right", padx=(16, 15), pady=15)
         self.SortBox.set("Sort By")
         
+        # Input field for searching records
         self.SearchEntry = ctk.CTkEntry(master=self.search_container, width=305, placeholder_text="Search Records", border_color="#2A8C55", border_width=2)
         self.SearchEntry.pack(side="right", padx=(13, 0), pady=15)
-            
+        
+        # Container/frame in which the button widgets are displayed
         self.buttons_frame = tk.Frame(master=self.search_container, bg=gray)
         self.buttons_frame.grid_propagate(0)
         self.buttons_frame.pack(side="left")
         
+        # Creating Button that will run a method which launches the window that accepts data for a new record
         self.addRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Add Record",  command=lambda: self.OpenButtonWindow(NewRecord(self.printrepository)), font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.addRecsBtn.pack(anchor="se", side="left", padx=(35, 0))
         
+        # Creating Button that will run a method which launches the window that allows record editing
         self.editRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Edit Record", command=lambda: self.OpenButtonWindow(EditRecord(self.printrepository)), font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.editRecsBtn.pack(anchor="se", side="left", padx=(21, 0))
-                
-        self.exportRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Export Records", command=lambda: self.OpenButtonWindow(ExportGRecords()), font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244", width=160)
+        
+        # Creating Button that will run a method which launches the window that exports records as excel file       
+        self.exportRecsBtn = ctk.CTkButton(master=self.buttons_frame, text="Export Records", command=lambda: self.OpenButtonWindow(ExportGRecords(self.printrepository)), font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244", width=160)
         self.exportRecsBtn.pack(anchor="se", side="left", padx=(21, 0))
-                 
+        
+        # Variables to store values that populate table         
         self.columns = ["Record ID", "Employee Name", "Printer Model", "Colored / B&W", "Quantity", "Page Size", "Page Type", "Description", "Date", "Time", "Comments"]
         self.table_data = [
             self.columns,        
         ] 
 
+        # Creating container for table, creating and populating table
         self.table_frame = CTkXYFrame(master=self.main_view, width=1100, height=650, fg_color="#fff")
         self.table_frame.pack(expand=True, fill="both", padx=(25, 18), pady=20)
         self.table_frame.pack(anchor="w", side="left")
@@ -76,7 +97,8 @@ class GeneralRecordsUI(tk.Frame):
         
         self.UpdateTable()
     
-        
+    
+    # Method to repopulate table to reflect any changes to its data
     def UpdateTable(self):
         self.table.update_values(values=self.columns)
         self.table_data = []
@@ -89,42 +111,37 @@ class GeneralRecordsUI(tk.Frame):
         self.table.update_values(values=self.table_data)
        
        
-        
+    
+    # Method to launch the window of the desired classtype 
     def OpenButtonWindow(self, classtype):
         if self.box != None:                
             if self.box.window.winfo_exists() != True:                      
-                # show Toplevel
+                # create window
                 self.box = classtype
                     
                 # set it modal (to wait for value)
                 self.box.window.focus_force()
                 #self.box.window.focus_set()   # take over input focus,
-                self.box.window.grab_set()    # disable other windows while I'm open,
+                #self.box.window.grab_set()    # disable other windows while I'm open,
                 self.box.window.wait_window() # and wait here until win destroyed
         else:
-            # show Toplevel
+            # create window
             self.box = classtype
                 
             # set it modal (to wait for value)
             self.box.window.focus_force()
             #self.box.window.focus_set()   # take over input focus,
-            self.box.window.grab_set()    # disable other windows while I'm open,
+            #self.box.window.grab_set()    # disable other windows while I'm open,
             self.box.window.wait_window() # and wait here until win destroyed
 
-            # get value from Toplevel
-            """print(type(self.box.entry_value))
-            self.SearchEntry.delete(0 ,'end')
-            self.SearchEntry.insert(0, self.box.entry_value)"""
-            
+        # Update table if the lauched window makes any change to the database  
         self.UpdateTable()
             
             
              
         
-
+# Window that accepts data for a new record, adding it to the system if input is valid
 class NewRecord:
-    entry_value = '' # ignore this
-    
     def __init__(self, printrepository):
         # Storing repository
         self.repo = printrepository
@@ -139,10 +156,12 @@ class NewRecord:
         gray = "#F0F0F0"
         black = "#000000"
         
+        # Creating window and initializing it
         self.window = tk.Toplevel()
         self.window.iconbitmap(icon_img)      
         self.window.wm_title("Add New Record")
-   
+        
+        # Set app size and centering it
         window_height = 580
         window_width = 385
         screen_width = self.window.winfo_screenwidth()
@@ -156,14 +175,7 @@ class NewRecord:
         
         ctk.set_appearance_mode("light")  # keeps ctk widgets white
         
-        """self.recordidframe = tk.Frame(self.window)
-        self.recordidframe.pack(anchor='center', side='top', pady=10)
-        self.label = tk.Label(self.recordidframe, text='Record ID: ', font=("Arial Black", 12), fg="#2A8C55")
-        self.label.pack(side="left")      
-        self.idinfolbl = tk.Label(self.recordidframe, font=("Arial", 12))
-        self.idinfolbl.pack(side="left") 
-        self.idinfolbl.configure(text= "#" + str(51)) """
-        
+        # Creating container for employee entry drop down field
         self.employeeframe = tk.Frame(self.window, width=80)
         self.employeeframe.pack(anchor='nw', side='top', pady=(20,10))
         self.label = tk.Label(self.employeeframe, text='Employee: ')
@@ -172,6 +184,7 @@ class NewRecord:
         self.EmployeeBox.pack(side="right")
         self.EmployeeBox.set("Select Employee")
         
+        # Creating container for printer model entry drop down field
         self.printerframe = tk.Frame(self.window, width=80)
         self.printerframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.printerframe, text='Printer Model: ')
@@ -180,6 +193,7 @@ class NewRecord:
         self.PrintModelBox.pack(side="right")
         self.PrintModelBox.set("Select Model")
         
+        # Creating container for b&w and colored radio button options
         self.radiobuttonsframe = tk.Frame(self.window, width=80)
         self.radiobuttonsframe.pack(anchor='nw', side='top', pady=10)
         self.radio_var = tk.StringVar()
@@ -188,6 +202,7 @@ class NewRecord:
         self.blackwhitebtn = ctk.CTkRadioButton(master=self.radiobuttonsframe, text="Black & White", variable=self.radio_var, value="Black & White")
         self.blackwhitebtn.pack(side="left")
         
+        # Creating container for page quantity entry
         self.pagesframe = tk.Frame(self.window, width=80)
         self.pagesframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.pagesframe, text='Quantity: ')
@@ -195,6 +210,7 @@ class NewRecord:
         self.pagesentry = ctk.CTkEntry(master=self.pagesframe, width=50, border_color="#2A8C55", border_width=2)
         self.pagesentry.pack(side="right", padx=18)
         
+        # Creating container for page size drop down field
         self.pagesizeframe = tk.Frame(self.window, width=80)
         self.pagesizeframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.pagesizeframe, text='Page Size: ')
@@ -203,6 +219,7 @@ class NewRecord:
         self.PageSizeBox.pack(side="right", padx=11)
         self.PageSizeBox.set("Select Paper Size")
         
+        # Creating container for page type drop down field
         self.pagetypeframe = tk.Frame(self.window, width=80)
         self.pagetypeframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.pagetypeframe, text='Page Type: ')
@@ -211,6 +228,7 @@ class NewRecord:
         self.PageTypeBox.pack(side="right", padx=6)
         self.PageTypeBox.set("Select Paper Type")        
         
+        # Creating container for description drop down field
         self.descriptionframe = tk.Frame(self.window, width=80)
         self.descriptionframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.descriptionframe, text='Description: ')
@@ -220,6 +238,7 @@ class NewRecord:
         self.DescrBox.set("Select an Option")
         
         
+        # Creating container for date entry field, autofilled with current date
         self.datetimeframe = tk.Frame(self.window, width=80)
         self.datetimeframe.pack(anchor='nw', side='top', pady=12)
         self.label = tk.Label(self.datetimeframe, text='Date:')
@@ -230,6 +249,7 @@ class NewRecord:
         datestamp = time.strftime('%d/%m/%Y')        
         self.dateentry.insert(0, datestamp)
         
+        # Creating container for time entry fields, autofilled with current time
         self.label = tk.Label(self.datetimeframe, text='Time:')
         self.label.pack(side="left", padx=(18,10))      
         self.hrsentry = ctk.CTkEntry(master=self.datetimeframe, width=29, border_color="#2A8C55", border_width=2)
@@ -247,7 +267,7 @@ class NewRecord:
         pm = time.strftime('%p')
         self.PMBox.set(pm)
         
-        
+        # Creating container for comments entry field
         self.commentsframe = tk.Frame(self.window)
         self.commentsframe.pack(anchor='nw', side='top', padx=15, pady=(13,5))
         self.label = tk.Label(self.commentsframe, text='Comments: ')
@@ -256,33 +276,26 @@ class NewRecord:
         self.commentsbox.pack(anchor='nw', side="bottom", padx=3)      
         
         
+        # Container/frame in which the button widgets are displayed
         self.buttonframe = tk.Frame(self.window)
         self.buttonframe.pack(anchor='center', side='bottom', pady=20)
+        # Create button which launches error checking on fields and submits a valid record
         self.addrecbtn = ctk.CTkButton(self.buttonframe, text="Create", command=self.AddNewRecord, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.addrecbtn.pack(side='left', padx=15)
+        # Create button which closes window
         self.cancelbtn = ctk.CTkButton(self.buttonframe, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.cancelbtn.pack(side='left', padx=15)
         
         
-
-        """self.frame = ttk.Frame(self.window)
-        self.frame.pack(side='bottom')
-        
-        self.entry = ttk.Entry(self.frame)
-        self.entry.pack(side='left')
-
-        self.button = ttk.Button(self.frame, text="Ok", command=self.name_input_box_exit)
-        self.button.pack(side='left')"""
-
+    # Method to close method
     def window_exit(self):
-        # get value from widget and assign to variable        
-        """self.entry_value = self.entry.get()
-        print(self.entry_value)"""
-
         self.window.destroy()    
         
+    # Method to add a valid record to database
     def AddNewRecord(self):        
-        #Error checking first here        
+        # Stores an error check for each field. If an error occurs, the associated index
+        # for that field does not become one. Only if all field checks pass (become one) 
+        # will the record be added        
         valid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         errorLst = []
         
@@ -383,10 +396,11 @@ class NewRecord:
         
         
  
-        
+# Window that searches for a record given an id and displays its contents, allowing 
+# for editing and deleting of that record      
 class EditRecord:
     def __init__(self, printrepository):
-        # Storing repository
+        # Storing reference to repository
         self.repo = printrepository
         self.time = ''       
         
@@ -400,10 +414,12 @@ class EditRecord:
         gray = "#F0F0F0"
         black = "#000000"
         
+        # Creating window and initializing it
         self.window = tk.Toplevel()
         self.window.iconbitmap(icon_img)      
         self.window.wm_title("Edit Record")        
         
+        # Set app size and centering it
         window_height = 620
         window_width = 385
         screen_width = self.window.winfo_screenwidth()
@@ -412,11 +428,11 @@ class EditRecord:
         y_cordinate = 35
         self.window.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
             
-        self.window.resizable(False,False) 
-        
+        self.window.resizable(False,False)         
         
         ctk.set_appearance_mode("light")  # keeps ctk widgets white
         
+        # Creating container for id entry to search
         self.recordidframe = tk.Frame(self.window)
         self.recordidframe.pack(anchor='nw', side='top', pady=15)
         self.label = tk.Label(self.recordidframe, text='Enter Record ID#:', font=("Arial Black", 11), fg="#2A8C55")
@@ -426,6 +442,7 @@ class EditRecord:
         self.findbtn = ctk.CTkButton(self.recordidframe, text="Find", command=self.FindRecord, width=69, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.findbtn.pack(side='left', padx=15)           
                 
+        # Creating container for employee entry drop down field        
         self.employeeframe = tk.Frame(self.window, width=80)
         self.employeeframe.pack(anchor='nw', side='top', pady=(20,10))
         self.label = tk.Label(self.employeeframe, text='Employee: ')
@@ -434,6 +451,7 @@ class EditRecord:
         self.EmployeeBox.pack(side="right")
         self.EmployeeBox.set("Select Employee")
         
+        # Creating container for printer model entry drop down field
         self.printerframe = tk.Frame(self.window, width=80)
         self.printerframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.printerframe, text='Printer Model: ')
@@ -442,6 +460,7 @@ class EditRecord:
         self.PrintModelBox.pack(side="right")
         self.PrintModelBox.set("Select Model")
         
+        # Creating container for b&w and colored radio button options
         self.radiobuttonsframe = tk.Frame(self.window, width=80)
         self.radiobuttonsframe.pack(anchor='nw', side='top', pady=10)
         self.radio_var = tk.StringVar()
@@ -450,6 +469,7 @@ class EditRecord:
         self.blackwhitebtn = ctk.CTkRadioButton(master=self.radiobuttonsframe, text="Black & White", variable=self.radio_var, value="Black & White")
         self.blackwhitebtn.pack(side="left")
         
+        # Creating container for page quantity entry
         self.pagesframe = tk.Frame(self.window, width=80)
         self.pagesframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.pagesframe, text='Quantity: ')
@@ -457,6 +477,7 @@ class EditRecord:
         self.pagesentry = ctk.CTkEntry(master=self.pagesframe, width=50, border_color="#2A8C55", border_width=2)
         self.pagesentry.pack(side="right", padx=18)
         
+        # Creating container for page size drop down field
         self.pagesizeframe = tk.Frame(self.window, width=80)
         self.pagesizeframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.pagesizeframe, text='Page Size: ')
@@ -465,6 +486,7 @@ class EditRecord:
         self.PageSizeBox.pack(side="right", padx=11)
         self.PageSizeBox.set("Select Paper Size")
         
+        # Creating container for page type drop down field
         self.pagetypeframe = tk.Frame(self.window, width=80)
         self.pagetypeframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.pagetypeframe, text='Page Type: ')
@@ -473,6 +495,7 @@ class EditRecord:
         self.PageTypeBox.pack(side="right", padx=6)
         self.PageTypeBox.set("Select Paper Type")        
         
+        # Creating container for description drop down field
         self.descriptionframe = tk.Frame(self.window, width=80)
         self.descriptionframe.pack(anchor='nw', side='top', pady=10)
         self.label = tk.Label(self.descriptionframe, text='Description: ')
@@ -481,6 +504,7 @@ class EditRecord:
         self.DescrBox.pack(side="right")
         self.DescrBox.set("Select an Option")
         
+        # Creating container for date entry field, autofilled with current date
         self.datetimeframe = tk.Frame(self.window, width=80)
         self.datetimeframe.pack(anchor='nw', side='top', pady=12)
         self.label = tk.Label(self.datetimeframe, text='Date:')
@@ -488,6 +512,7 @@ class EditRecord:
         self.dateentry = ctk.CTkEntry(master=self.datetimeframe, width=83, border_color="#2A8C55", border_width=2)
         self.dateentry.pack(side="left")
         
+        # Creating container for time entry fields, autofilled with current time
         self.label = tk.Label(self.datetimeframe, text='Time:')
         self.label.pack(side="left", padx=(18,10))      
         self.hrsentry = ctk.CTkEntry(master=self.datetimeframe, width=29, border_color="#2A8C55", border_width=2)
@@ -500,7 +525,7 @@ class EditRecord:
         self.PMBox.pack(side="left", padx=8)
 
         
-        
+        # Creating container for comments entry field
         self.commentsframe = tk.Frame(self.window)
         self.commentsframe.pack(anchor='nw', side='top', padx=15, pady=(13,5))
         self.label = tk.Label(self.commentsframe, text='Comments: ')
@@ -509,22 +534,28 @@ class EditRecord:
         self.commentsbox.pack(anchor='nw', side="bottom", padx=3)          
         
         
+        # Container/frame in which the button widgets are displayed
         self.buttonframe = tk.Frame(self.window)
         self.buttonframe.pack(anchor='center', side='bottom', pady=18)
+        # Create button which updates the found record with changes made using valid input
         self.saverecbtn = ctk.CTkButton(self.buttonframe, text="Save", state="disabled", command=self.SaveRecordChanges, font=("Arial Bold", 15), height=27, width=100, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.saverecbtn.pack(side='left', padx=(18,0))
+        # Create button which deletes a found record
         self.deleterecbtn = ctk.CTkButton(self.buttonframe, state="disabled", text="Delete", command=self.RemoveRecord, font=("Arial Bold", 15), height=27, width=105, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.deleterecbtn.pack(side='left', padx=18)  
+        # Create button which closes window
         self.cancelbtn = ctk.CTkButton(self.buttonframe, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, width=100, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.cancelbtn.pack(side='left', padx=(0,18))
 
 
+    # Method to close method
     def window_exit(self):
         self.window.destroy()  
         
-        
+    
+    # Method to find a record and adjust the input fields to reflect what was selected
     def FindRecord(self):
-        #Error checking on entry field
+        # Error checking on id entry field to make sure it was valid
         if self.idinfoentry.get().isdigit() != False:
             self.recordLst = self.repo.find_record(self.idinfoentry.get())
             if len(self.recordLst) < 1:
@@ -567,10 +598,8 @@ class EditRecord:
             mgbx.showerror('Error', 'Error: Invalid or Empty Record ID.')        
 
 
-        
+    # Method to remove a desired record from database after confirmation   
     def RemoveRecord(self):
-        #Error checking first here
-        
         result = mgbx.askquestion("Confirm", "Delete Record #" + self.idinfoentry.get() + "? This cannot be undone.")
         if result == 'yes':
             self.repo.delete_record(self.idinfoentry.get()) 
@@ -578,9 +607,11 @@ class EditRecord:
             mgbx.showinfo("Success", "Record deleted successfully.")
 
     
-    
+    # Method to save valid changes to a record and update the database to reflect it
     def SaveRecordChanges(self):    
-        #Error checking first here        
+        # Stores an error check for each field. If an error occurs, the associated index
+        # for that field does not become one. Only if all field checks pass (become one) 
+        # will the record be saved  
         valid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         errorLst = []
         
@@ -681,9 +712,14 @@ class EditRecord:
             mgbx.showerror('Error', 'Error with Input.\nPlease address the following:\n' + "\n".join(errorLst))
         
         
-        
+
+# Window that takes all records from the database and converts them to an excel file in a
+# given directory      
 class ExportGRecords:
-    def __init__(self):
+    def __init__(self, printrepository):
+        # Storing reference to repository
+        self.repo = printrepository
+        
         # Storing images
         icon_img = "images\\logo.ico"
         folder_img_data = pImg.open("images\\folder_icon.png")
@@ -696,11 +732,13 @@ class ExportGRecords:
         gray = "#F0F0F0"
         black = "#000000"
         
+        # Creating window and initializing it
         self.window = tk.Toplevel()
         self.window.iconbitmap(icon_img)      
         self.window.wm_title("Export General Records")       
         
-        window_height = 150
+        # Set app size and centering it
+        window_height = 230
         window_width = 385
         screen_width = self.window.winfo_screenwidth()
         #screen_height = self.window.winfo_screenheight()
@@ -711,11 +749,22 @@ class ExportGRecords:
         self.window.resizable(False,False) 
         
         
-        ctk.set_appearance_mode("light")  # keeps ctk widgets white       
+        ctk.set_appearance_mode("light")  # keeps ctk widgets white 
         
+        # Creating container for name entry field       
+        self.nameframe = tk.Frame(self.window)
+        self.nameframe.pack(anchor='nw', side='top', padx=15, pady=(17,0))
+        self.label = tk.Label(self.nameframe, text='Select File Name: ')
+        self.label.pack(anchor='nw', side="top", pady=(0,3))   
+        self.innerframe = tk.Frame(self.nameframe)
+        self.innerframe.pack(anchor='nw', side="bottom")
+        self.nameentry = ctk.CTkEntry(master=self.innerframe, width=299, border_color="#2A8C55", border_width=2)
+        self.nameentry.pack(side="left", padx=(3,10))      
+        
+        # Creating container for name entry field, autofilled to reflect directory selected
         self.linkframe = tk.Frame(self.window)
         self.linkframe.pack(anchor='nw', side='top', padx=15, pady=(17,0))
-        self.label = tk.Label(self.linkframe, text='Select Output Directory & File Name: ')
+        self.label = tk.Label(self.linkframe, text='Select Output Directory: ')
         self.label.pack(anchor='nw', side="top", pady=(0,3))   
         self.innerframe = tk.Frame(self.linkframe)
         self.innerframe.pack(anchor='nw', side="bottom")
@@ -726,20 +775,63 @@ class ExportGRecords:
         self.folderBtn.pack(side="right")
         
         
-        
+        # Container/frame in which the button widgets are displayed
         self.buttonframe = tk.Frame(self.window)
         self.buttonframe.pack(anchor='center', side='bottom', pady=(0,23))
-        self.exportbtn = ctk.CTkButton(self.buttonframe, width=170, text="Export To Excel", command=self.StartExport, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
+        # Create button which actively exports records to chosen directory
+        self.exportbtn = ctk.CTkButton(self.buttonframe, width=170, state="disabled", text="Export To Excel", command=self.StartExport, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.exportbtn.pack(side='left', padx=15)
+        # Create button which closes window
         self.cancelbtn = ctk.CTkButton(self.buttonframe, width=110, text="Cancel", command=self.window_exit, font=("Arial Bold", 15), height=27, text_color="#fff", fg_color="#2A8C55", hover_color="#207244")
         self.cancelbtn.pack(side='left', padx=15)
               
 
+    # Method to close method
     def window_exit(self):
         self.window.destroy()  
         
+    # Method to open file explorer to retrive the path to the desired directory  
     def OpenFileExplorer(self):
-        pass
+        try: 
+            self.selected_directory = fd.askdirectory()
+            """print("dir:") 
+            print(self.selected_directory)"""
+            self.linkentry.delete(0, tk.END)
+            self.linkentry.insert(0, self.selected_directory)
+            self.exportbtn.configure(state="normal")
+        except Exception as e: 
+            print(e) 
+            mgbx.showerror('Error','Error: ' + e)  
+        
     
+    # Method to export records to a valid directory
     def StartExport(self):
-        pass
+        # Checks to make sure the given file name and file directory is valid before exporting 
+        allowed = set(string.ascii_letters + string.digits + '_' + '-')
+        if self.nameentry.get() == "":
+            mgbx.showerror('Error','Error: Please enter a file name.')  
+        elif any(char not in allowed for char in self.nameentry.get()):
+            mgbx.showerror('Error','Error: File name must not have special characters.') 
+        elif self.linkentry.get() == "":
+            mgbx.showerror('Error','Error: Please select a directory.')
+        else:
+            records = self.repo.get_all_records()   
+            lst = []     
+            lst.append(["Record ID", "Employee Name", "Printer Model", "Colored / B&W", "Quantity", "Page Size", "Page Type", "Description", "Date", "Time", "Comments"])
+            for record in records:
+                lst.append([record.id, record.employee_name, record.printerModel, record.color, record.quantity,  record.paper_size, record.paper_type, record.description, record.date, record.time, record.comments])
+            
+            print("repo:")
+            print(lst)
+            
+            df = pd.DataFrame(lst)
+                        
+            try:
+                # Write DataFrame to an Excel file
+                df.to_excel(self.linkentry.get() + "\\" + self.nameentry.get() + ".xlsx",  index=False)
+                mgbx.showinfo('Success', 'Excel File created in: ' + self.linkentry.get())
+                self.window_exit()                  
+            except Exception:
+                mgbx.showerror('Error','Error: Export unsuccessful. Ensure \ndirectory path is valid.')  
+            
+        

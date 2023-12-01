@@ -1,3 +1,4 @@
+# Class that allows for the creation of Record objects using the desired fields
 class Record:
     def __init__(self, id, employee_name, printerModel, color, quantity, paper_size, paper_type, description, date, time, comments):
         self.id = id
